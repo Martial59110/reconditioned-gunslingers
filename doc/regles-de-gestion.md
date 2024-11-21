@@ -1,17 +1,32 @@
 # 📑 Règles de gestion
 
-**RG1 :** Les utilisateurs choisissent un rôle.  
-**RG2 :** Le maître du jeu n'incarne pas de personnage.  
-**RG3 :** Une partie n'a qu'un seul maître du jeu.  
-**RG4 :** Un observateur n'incarne pas de personnage.  
-**RG5 :** Un détective incarne un personnage parmi les 6.  
-**RG6 :** La limite de détective est de 6.  
-**RG7 :** Un personnage peut visiter une pièce plusieurs fois.  
-**RG8 :** Un personnage n'est associé qu'à un utilisateur.  
-**RG9 :** Les personnages commencent dans la même pièce.  
-**RG10 :** Un personnage se trouve dans une pièce à la fois.  
-**RG11 :** Les personnages peuvent se déplacer de pièce en pièce.  
-**RG12 :** L'heure d'entrée d'un personnage dans une pièce est enregistrée.  
-**RG13 :** Une partie contient 6 armes.  
-**RG14 :** Une partie contient 9 pièces.  
-**RG15 :** Une pièce contient 0 ou N objet.  
+## Gestion des utilisateurs
+- **RG1**: Un utilisateur possède un identifiant unique.
+- **RG2**: Un utilisateur possède un pseudonyme.
+- **RG3**: Chaque utilisateur est soit maître du jeu, détective ou observateur.
+- **RG4**: Il ne peut y avoir qu'un seul maître du jeu.
+- **RG5**: Il ne peut y avoir que 6 détectives.
+- **RG6**: Les détectives et le maitre du jeu incarnent un personnage du jeu. 
+- **RG7**: Il n'y a pas de limite concernant le nombre d'observateurs.
+
+## Gestion des salles
+- **RG8**: Une salle possède un identifiant unique.
+- **RG9**: Une salle possède un nom.
+- **RG10**: Il y a en tout 9 salles.
+- **RG11**: Une salle contient O ou N objets.
+
+## Gestion des objets
+- **RG12**: Un objet possède un identifiant unique.
+- **RG13**: Un objet possède un nom.
+- **RG14**: Il y a en tout 6 objets.
+
+## Gestion des personnages
+- **RG15**: Un personnage possède un identifiant unique.
+- **RG16**: Un personnage possède un nom.
+- **RG17**: Les personnages peuvent se déplacer de salle en salle.
+- **RG18**: Un personnage peut visiter plusieurs salles.
+- **RG19**: Un personnage peut visiter la même salle plusieurs fois.
+- **RG20**: Un personnage peut se trouver dans une seule salle à la fois.
+- **RG21**: L'heure d'entrée d'un personnage dans une salle est enregistrée.
+- **RG22**: L'heure de sortie d'un personnage dans une salle est enregistrée.
+- **RG23**: Chaque personnage a une salle attitrée pour commencer une partie. 
