@@ -13,6 +13,5 @@
 **RG11 :** Les personnages peuvent se déplacer de pièce en pièce.  
 **RG12 :** L'heure d'entrée d'un personnage dans une pièce est enregistrée.  
 **RG13 :** Une partie contient 6 armes.  
-**RG14 :** Une partie contient 9 salles.  
-**RG15 :** Une partie contient 0 ou N objet.  
-**RG16 :** Un objet peut se trouver dans une pièce.  
+**RG14 :** Une partie contient 9 pièces.  
+**RG15 :** Une pièce contient 0 ou N objet.  
