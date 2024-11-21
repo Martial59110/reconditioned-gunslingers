@@ -8,10 +8,9 @@
 | `nom_role`              | VARCHAR     | 50           | Nom du rôle de l'utilisateur                    |
 | `id_personnage`         | INTEGER     |              | Identifiant du personnage                        |
 | `nom_personnage`        | VARCHAR     | 50           | Nom du personnage                                |
-| `couleur_personnage`    | VARCHAR     | 20           | Couleur associée au personnage                  |
 | `id_salle`              | INTEGER     |              | Identifiant de la salle                          |
 | `nom_salle`             | VARCHAR     | 50           | Nom de la salle                                  |
 | `id_objet`              | INTEGER     |              | Identifiant de l'objet                           |
 | `nom_objet`             | VARCHAR     | 50           | Nom de l'objet                                   |
-| `heure_arrivee`         | TIME        |              | Heure d'arrivée du personnage dans la salle      |
-| `heure_sortie`          | TIME        |              | Heure de sortie du personnage de la salle        |
+| `heure_arrivee`         | TIMESTAMPZ       |              | Heure d'arrivée du personnage dans la salle      |
+| `heure_sortie`          | TIMESTAMPZ        |              | Heure de sortie du personnage de la salle        |
