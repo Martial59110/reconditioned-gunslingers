@@ -1,22 +1,16 @@
- ## Dictionnaire de données pour Simpluedo
+ ## 🌀 Dictionnaire de données pour Simpluedo 
 
-| Nom de la colonne  | Type         | Taille       | Description                                      |
-|--------------------|--------------|--------------|--------------------------------------------------|
-| `user_UUID`        | UUID         |              | Identifiant unique de l'utilisateur              |
-| `pseudo`           | VARCHAR      |              | Pseudonyme de l'utilisateur                      |
-| `role`            | VARCHAR      |              | role attribué à l'utilisateur sur 1 partie       |
-| `id_perso`         | INTEGER      |              | identifiant du personnage                        |
-| `nom_perso`        | VARCHAR      |              | nom du personnage                                |
-| `couleur_perso`    | VARCHAR      |              | couleur du personnage                            |
-| `image_perso`      | VARCHAR      |              | image du personnage                              |
-| `description_perso`| VARCHAR      |              | description du personnage                        |
-| `id_salle`         | INTEGER      |              | identifiant de la salle                          |
-| `nom_salle`        | VARCHAR      |              | nom de la salle                                  |
-| `image_salle`      | VARCHAR      |              | image de la salle                                |
-| `description_salle`| VARCHAR      |              | description de la salle                          |
-| `id_objet`         | INTEGER      |              | identifiant de l'objet                           |
-| `nom_objet`        | VARCHAR      |              | nom de l'objet                                   |
-| `description_objet`| VARCHAR      |              | description de l'objet                           |
-| `image_objet`      | VARCHAR      |              | image de l'objet                                 |
-| `heure_arrivee`     | TIME         |              | heure d'arrivée d'un personnage dans une salle      |
-| `heure_sortie`     | TIME         |              | heure de sortie d'un personnage dans une salle   | 
+| **Nom de la colonne**  | **Type**    | **Taille**   | **Description**                                  |
+|-------------------------|-------------|--------------|--------------------------------------------------|
+| `uuid_utilisateur`      | UUID        |              | Identifiant unique de l'utilisateur              |
+| `pseudo_utilisateur`    | VARCHAR     | 50           | Pseudonyme de l'utilisateur                      |
+| `id_role`               | INTEGER     |              | Identifiant du rôle attribué à l'utilisateur     |
+| `nom_role`              | VARCHAR     | 50           | Nom du rôle de l'utilisateur                    |
+| `id_personnage`         | INTEGER     |              | Identifiant du personnage                        |
+| `nom_personnage`        | VARCHAR     | 50           | Nom du personnage                                |
+| `id_salle`              | INTEGER     |              | Identifiant de la salle                          |
+| `nom_salle`             | VARCHAR     | 50           | Nom de la salle                                  |
+| `id_objet`              | INTEGER     |              | Identifiant de l'objet                           |
+| `nom_objet`             | VARCHAR     | 50           | Nom de l'objet                                   |
+| `heure_arrivee`         | TIMESTAMPZ       |              | Heure d'arrivée du personnage dans la salle      |
+| `heure_sortie`          | TIMESTAMPZ        |              | Heure de sortie du personnage de la salle        |
