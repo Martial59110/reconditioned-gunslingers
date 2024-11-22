@@ -5,61 +5,61 @@
 psql postgres 
 
 --------------------------------------------------------------------------------------------------------
--- Suppression de la base de données simpluedo si elle existe déjà : 
+-- Suppression de la base de données simpluedo si elle existe déjà :
 --------------------------------------------------------------------------------------------------------
 
-DROP DATABASE simpluedo;
+DROP DATABASE IF EXISTS simpluedo;
 
 --------------------------------------------------------------------------------------------------------
--- Création de la base de données simpluedo : 
+-- Création de la base de données simpluedo :
 --------------------------------------------------------------------------------------------------------
 
 CREATE DATABASE simpluedo;
 
 --------------------------------------------------------------------------------------------------------
--- Création d'un utilisateur et de son mot de passe : 
+-- Connexion à la base de données simpluedo :
+--------------------------------------------------------------------------------------------------------
+
+\c simpluedo
+
+--------------------------------------------------------------------------------------------------------
+-- Création d'un utilisateur et de son mot de passe :
 --------------------------------------------------------------------------------------------------------
 
 CREATE USER admin_simpluedo WITH PASSWORD 'password_simpluedo';
 
 --------------------------------------------------------------------------------------------------------
--- Accord du privilège de création de rôle à l'utilisateur admin_simpluedo : 
+-- Accord du privilège de création de rôle à l'utilisateur admin_simpluedo :
+--------------------------------------------------------------------------------------------------------
+
+GRANT ALL PRIVILEGES ON DATABASE simpluedo TO admin_simpluedo;
+
+--------------------------------------------------------------------------------------------------------
+-- Activation de l'extension uuid-ossp (pour les UUID) :
 --------------------------------------------------------------------------------------------------------
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 --------------------------------------------------------------------------------------------------------
--- Quitter l'interface psql : 
---------------------------------------------------------------------------------------------------------
-
-\q
-
---------------------------------------------------------------------------------------------------------
--- Connexion à la base de données simpluedo avec l'identifiant admin_simpluedo en utilisant pgcli :
---------------------------------------------------------------------------------------------------------
-
-pgcli -U postgres -d simpluedo
-
---------------------------------------------------------------------------------------------------------
--- Création de la table role : 
+-- Création de la table roles :
 --------------------------------------------------------------------------------------------------------
 
 CREATE TABLE roles (
     id_role INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom_role VARCHAR(50) NOT NULL,
+    nom_role VARCHAR(50) NOT NULL
 );
 
 --------------------------------------------------------------------------------------------------------
--- Création de la table personnage :
+-- Création de la table personnages :
 --------------------------------------------------------------------------------------------------------
 
 CREATE TABLE personnages (
     id_personnage INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom_personnage VARCHAR(50) NOT NULL,
+    nom_personnage VARCHAR(50) NOT NULL
 );
 
 --------------------------------------------------------------------------------------------------------
--- Création de la table utilisateur : 
+-- Création de la table utilisateurs :
 --------------------------------------------------------------------------------------------------------
 
 CREATE TABLE utilisateurs (
@@ -67,53 +67,53 @@ CREATE TABLE utilisateurs (
     pseudo_utilisateur VARCHAR(50) NOT NULL,
     id_role INTEGER NOT NULL,
     id_personnage INTEGER NOT NULL,
-    FOREIGN KEY (id_role) REFERENCES role (id_role) ON UPDATE CASCADE,
-    FOREIGN KEY (id_personnage) REFERENCES personnage (id_personnage) ON UPDATE CASCADE,
+    FOREIGN KEY (id_role) REFERENCES roles (id_role) ON UPDATE CASCADE,
+    FOREIGN KEY (id_personnage) REFERENCES personnages (id_personnage) ON UPDATE CASCADE
 );
 
 --------------------------------------------------------------------------------------------------------
--- Création de la table salle :
+-- Création de la table salles :
 --------------------------------------------------------------------------------------------------------
 
 CREATE TABLE salles (
     id_salle INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nom_salle VARCHAR(50) NOT NULL,
+    nom_salle VARCHAR(50) NOT NULL
 );
 
 --------------------------------------------------------------------------------------------------------
--- Création de la table objet :
+-- Création de la table objets :
 --------------------------------------------------------------------------------------------------------
 
 CREATE TABLE objets (
     id_objet INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nom_objet VARCHAR(50) NOT NULL,
     id_salle INTEGER NOT NULL,
-    FOREIGN KEY (id_salle) REFERENCES salle (id_salle) ON UPDATE CASCADE,
+    FOREIGN KEY (id_salle) REFERENCES salles (id_salle) ON UPDATE CASCADE
 );
 
 --------------------------------------------------------------------------------------------------------
--- Création de la table d'association visiter pour les relations entre personnage et salle :
+-- Création de la table d'association visiter :
 --------------------------------------------------------------------------------------------------------
 
 CREATE TABLE visiter (
-    id_personnage INTEGER REFERENCES personnage(id_personnage),
-    id_salle INTEGER REFERENCES salle(id_salle),
+    id_personnage INTEGER REFERENCES personnages (id_personnage),
+    id_salle INTEGER REFERENCES salles (id_salle),
     heure_arrivee TIME NOT NULL,
     heure_sortie TIME NULL,
-    PRIMARY KEY(id_personnage, id_salle, heure_arrivee)
+    PRIMARY KEY (id_personnage, id_salle, heure_arrivee)
 );
 
 --------------------------------------------------------------------------------------------------------
--- Accorde des privilèges insertion, mise à jour, suppression et sélection l'utilisateur admin_simpluedo : 
+-- Accorde des privilèges à l'utilisateur admin_simpluedo :
 --------------------------------------------------------------------------------------------------------
 
-GRANT INSERT, UPDATE, DELETE, SELECT ON TABLE roles, personnages, utilisateurs, salles, objets, visiter TO 'admin_simpluedo';
+GRANT INSERT, UPDATE, DELETE, SELECT ON TABLE roles, personnages, utilisateurs, salles, objets, visiter TO admin_simpluedo;
 
 --------------------------------------------------------------------------------------------------------
--- Révoque les privilèges insertion, mise à jour, suppression et sélection : 
+-- Révoque les privilèges pour PUBLIC :
 --------------------------------------------------------------------------------------------------------
 
-REVOKE UPDATE ON TABLE roles, personnages, utilisateurs, salles, objets, visiter FROM PUBLIC;
+REVOKE ALL ON TABLE roles, personnages, utilisateurs, salles, objets, visiter FROM PUBLIC;
 --------------------------------------------------------------------------------------------------------
 
 --> UUID PRIMARY KEY : permet de générer des identifiants uniques pour assurer une unicité globale. 
