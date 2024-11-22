@@ -171,7 +171,7 @@ BEGIN
     UPDATE visiter
     SET heure_sortie = NOW()
     WHERE id_personnage = id_personnage_input
-      AND heure_sortie IS NULL;
+    AND heure_sortie IS NULL;
 
     -- Insère le nouveau déplacement dans visiter
     INSERT INTO visiter (id_personnage, id_salle, heure_arrivee)
@@ -197,7 +197,7 @@ BEGIN
     UPDATE visiter
     SET heure_sortie = NEW.heure_arrivee
     WHERE id_personnage = NEW.id_personnage
-      AND heure_sortie IS NULL;
+    AND heure_sortie IS NULL;
 
     -- Met à jour ou insère dans position_actuelle
     INSERT INTO position_actuelle (id_personnage, id_salle, heure_arrivee)
