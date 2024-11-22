@@ -114,6 +114,100 @@ GRANT INSERT, UPDATE, DELETE, SELECT ON TABLE roles, personnages, utilisateurs, 
 --------------------------------------------------------------------------------------------------------
 
 REVOKE ALL ON TABLE roles, personnages, utilisateurs, salles, objets, visiter FROM PUBLIC;
+
+--------------------------------------------------------------------------------------------------------
+-- Création de procédures stockées :
+--------------------------------------------------------------------------------------------------------
+
+-- 1. Ajouter un objet à une salle passée en paramètre
+CREATE OR REPLACE FUNCTION ajouter_objet(nom_objet VARCHAR, nom_salle VARCHAR)
+RETURNS VOID AS $$
+DECLARE
+    salle_id INTEGER;
+BEGIN
+    -- Récupération de l'ID de la salle
+    SELECT id_salle INTO salle_id
+    FROM salles
+    WHERE nom_salle = nom_salle;
+
+    -- Si la salle n'existe pas, on lève une exception
+    IF salle_id IS NULL THEN
+        RAISE EXCEPTION 'La salle "%" n''existe pas.', nom_salle;
+    END IF;
+
+    -- Ajout de l'objet dans la salle
+    INSERT INTO objets (nom_objet, id_salle)
+    VALUES (nom_objet, salle_id);
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2. Lister les objets d'une salle
+CREATE OR REPLACE FUNCTION lister_objets(nom_salle VARCHAR)
+RETURNS TABLE (nom_objet VARCHAR) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT o.nom_objet
+    FROM objets o
+    JOIN salles s ON o.id_salle = s.id_salle
+    WHERE s.nom_salle = nom_salle;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 3. Gérer l'entrée d'un personnage dans une salle
+CREATE OR REPLACE FUNCTION gerer_entree_personnage(id_personnage_input INTEGER, id_salle_input INTEGER, heure_arrivee_input TIME)
+RETURNS VOID AS $$
+BEGIN
+    -- Vérifie si le personnage est déjà dans une autre salle sans sortie
+    IF EXISTS (
+        SELECT 1
+        FROM visiter
+        WHERE id_personnage = id_personnage_input
+          AND heure_sortie IS NULL
+          AND id_salle != id_salle_input
+    ) THEN
+        RAISE EXCEPTION 'Le personnage % est déjà dans une autre salle.', id_personnage_input;
+    END IF;
+
+    -- Insère l'entrée du personnage
+    INSERT INTO visiter (id_personnage, id_salle, heure_arrivee)
+    VALUES (id_personnage_input, id_salle_input, heure_arrivee_input);
+END;
+$$ LANGUAGE plpgsql;
+
+-- 4. Compléter l'heure de sortie
+CREATE OR REPLACE FUNCTION completer_sortie_personnage(id_personnage_input INTEGER, heure_sortie_input TIME)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE visiter
+    SET heure_sortie = heure_sortie_input
+    WHERE id_personnage = id_personnage_input
+      AND heure_sortie IS NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------------------------------------
+-- Création de triggers pour automatiser les mises à jour :
+--------------------------------------------------------------------------------------------------------
+
+-- Trigger pour gérer les déplacements des personnages
+CREATE OR REPLACE FUNCTION trigger_gestion_deplacement_personnage()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Complète automatiquement l'heure de sortie de la salle précédente
+    UPDATE visiter
+    SET heure_sortie = NEW.heure_arrivee
+    WHERE id_personnage = NEW.id_personnage
+      AND heure_sortie IS NULL;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_deplacement_personnage
+BEFORE INSERT ON visiter
+FOR EACH ROW
+EXECUTE FUNCTION trigger_gestion_deplacement_personnage();
+
 --------------------------------------------------------------------------------------------------------
 
 --> UUID PRIMARY KEY : permet de générer des identifiants uniques pour assurer une unicité globale. 
