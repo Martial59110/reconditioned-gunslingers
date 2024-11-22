@@ -51,6 +51,19 @@ INSERT INTO salles (nom_salle) VALUES ('nouvelle salle');
 -- Modifier un objet :
 -------------------------------------------------------------------------------------------------------- 
 
+UPDATE objets
+SET nom_objet = 'nouvel objet'
+WHERE id_objet = 1;
+
 --------------------------------------------------------------------------------------------------------
 -- Supprimer une pièce:
 -------------------------------------------------------------------------------------------------------- 
+
+DELETE FROM objets
+WHERE id_salle = 3;
+
+DELETE FROM visiter
+WHERE id_salle = 3;
+
+DELETE FROM salles
+WHERE id_salle = 3;
