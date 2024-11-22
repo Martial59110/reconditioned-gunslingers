@@ -12,5 +12,5 @@
 | `nom_salle`             | VARCHAR     | 50           | Nom de la salle                                  |
 | `id_objet`              | INTEGER     |              | Identifiant de l'objet                           |
 | `nom_objet`             | VARCHAR     | 50           | Nom de l'objet                                   |
-| `heure_arrivee`         | TIMESTAMPZ       |              | Heure d'arrivée du personnage dans la salle      |
-| `heure_sortie`          | TIMESTAMPZ        |              | Heure de sortie du personnage de la salle        |
+| `heure_arrivee`         | TIME       |              | Heure d'arrivée du personnage dans la salle      |
+| `heure_sortie`          | TIME      |              | Heure de sortie du personnage de la salle        |
