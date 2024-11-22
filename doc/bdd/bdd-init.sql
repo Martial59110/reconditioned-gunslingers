@@ -65,8 +65,8 @@ CREATE TABLE personnages (
 CREATE TABLE utilisateurs (
     uuid_utilisateur UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     pseudo_utilisateur VARCHAR(50) NOT NULL,
-    id_role INTEGER NOT NULL,
-    id_personnage INTEGER NOT NULL,
+    id_role INTEGER NULL,
+    id_personnage INTEGER NULL,
     FOREIGN KEY (id_role) REFERENCES roles (id_role) ON UPDATE CASCADE,
     FOREIGN KEY (id_personnage) REFERENCES personnages (id_personnage) ON UPDATE CASCADE
 );
@@ -104,16 +104,26 @@ CREATE TABLE visiter (
 );
 
 --------------------------------------------------------------------------------------------------------
+-- Création de la table position_actuelle :
+--------------------------------------------------------------------------------------------------------
+
+CREATE TABLE position_actuelle (
+    id_personnage INTEGER PRIMARY KEY REFERENCES personnages (id_personnage),
+    id_salle INTEGER REFERENCES salles (id_salle),
+    heure_arrivee TIME NOT NULL DEFAULT NOW()
+);
+
+--------------------------------------------------------------------------------------------------------
 -- Accorde des privilèges à l'utilisateur admin_simpluedo :
 --------------------------------------------------------------------------------------------------------
 
-GRANT INSERT, UPDATE, DELETE, SELECT ON TABLE roles, personnages, utilisateurs, salles, objets, visiter TO admin_simpluedo;
+GRANT INSERT, UPDATE, DELETE, SELECT ON TABLE roles, personnages, utilisateurs, salles, objets, visiter, position_actuelle TO admin_simpluedo;
 
 --------------------------------------------------------------------------------------------------------
 -- Révoque les privilèges pour PUBLIC :
 --------------------------------------------------------------------------------------------------------
 
-REVOKE ALL ON TABLE roles, personnages, utilisateurs, salles, objets, visiter FROM PUBLIC;
+REVOKE ALL ON TABLE roles, personnages, utilisateurs, salles, objets, visiter, position_actuelle FROM PUBLIC;
 
 --------------------------------------------------------------------------------------------------------
 -- Création de procédures stockées :
@@ -154,34 +164,24 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- 3. Gérer l'entrée d'un personnage dans une salle
-CREATE OR REPLACE FUNCTION gerer_entree_personnage(id_personnage_input INTEGER, id_salle_input INTEGER, heure_arrivee_input TIME)
+CREATE OR REPLACE FUNCTION gerer_entree_personnage(id_personnage_input INTEGER, id_salle_input INTEGER)
 RETURNS VOID AS $$
 BEGIN
-    -- Vérifie si le personnage est déjà dans une autre salle sans sortie
-    IF EXISTS (
-        SELECT 1
-        FROM visiter
-        WHERE id_personnage = id_personnage_input
-          AND heure_sortie IS NULL
-          AND id_salle != id_salle_input
-    ) THEN
-        RAISE EXCEPTION 'Le personnage % est déjà dans une autre salle.', id_personnage_input;
-    END IF;
-
-    -- Insère l'entrée du personnage
-    INSERT INTO visiter (id_personnage, id_salle, heure_arrivee)
-    VALUES (id_personnage_input, id_salle_input, heure_arrivee_input);
-END;
-$$ LANGUAGE plpgsql;
-
--- 4. Compléter l'heure de sortie
-CREATE OR REPLACE FUNCTION completer_sortie_personnage(id_personnage_input INTEGER, heure_sortie_input TIME)
-RETURNS VOID AS $$
-BEGIN
+    -- Complète l'heure de sortie dans visiter pour le déplacement précédent
     UPDATE visiter
-    SET heure_sortie = heure_sortie_input
+    SET heure_sortie = NOW()
     WHERE id_personnage = id_personnage_input
       AND heure_sortie IS NULL;
+
+    -- Insère le nouveau déplacement dans visiter
+    INSERT INTO visiter (id_personnage, id_salle, heure_arrivee)
+    VALUES (id_personnage_input, id_salle_input, NOW());
+
+    -- Met à jour ou insère dans position_actuelle
+    INSERT INTO position_actuelle (id_personnage, id_salle, heure_arrivee)
+    VALUES (id_personnage_input, id_salle_input, NOW())
+    ON CONFLICT (id_personnage)
+    DO UPDATE SET id_salle = EXCLUDED.id_salle, heure_arrivee = EXCLUDED.heure_arrivee;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -190,24 +190,29 @@ $$ LANGUAGE plpgsql;
 --------------------------------------------------------------------------------------------------------
 
 -- Trigger pour gérer les déplacements des personnages
-CREATE OR REPLACE FUNCTION trigger_gestion_heure_sortie()
+CREATE OR REPLACE FUNCTION trigger_update_position_actuelle()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Complète automatiquement l'heure de sortie de la salle précédente
+    -- Complète l'heure de sortie dans visiter
     UPDATE visiter
-    SET heure_sortie = NOW()
+    SET heure_sortie = NEW.heure_arrivee
     WHERE id_personnage = NEW.id_personnage
       AND heure_sortie IS NULL;
 
-    -- Continue avec l'insertion de la nouvelle ligne
+    -- Met à jour ou insère dans position_actuelle
+    INSERT INTO position_actuelle (id_personnage, id_salle, heure_arrivee)
+    VALUES (NEW.id_personnage, NEW.id_salle, NEW.heure_arrivee)
+    ON CONFLICT (id_personnage)
+    DO UPDATE SET id_salle = EXCLUDED.id_salle, heure_arrivee = EXCLUDED.heure_arrivee;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER maj_heure_sortie_trigger
-BEFORE INSERT ON visiter
+CREATE TRIGGER update_position_actuelle_trigger
+AFTER INSERT ON visiter
 FOR EACH ROW
-EXECUTE FUNCTION trigger_gestion_heure_sortie();
+EXECUTE FUNCTION trigger_update_position_actuelle();
 
 --------------------------------------------------------------------------------------------------------
 
