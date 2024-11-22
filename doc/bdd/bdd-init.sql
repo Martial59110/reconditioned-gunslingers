@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------------------------
--- Connexion à postgresql en tant qu'utilisateur par défaut : 
+-- Connexion à PostgreSQL en tant qu'utilisateur par défaut : 
 --------------------------------------------------------------------------------------------------------
 
 psql postgres 
@@ -98,7 +98,7 @@ CREATE TABLE objets (
 CREATE TABLE visiter (
     id_personnage INTEGER REFERENCES personnages (id_personnage),
     id_salle INTEGER REFERENCES salles (id_salle),
-    heure_arrivee TIME NOT NULL,
+    heure_arrivee TIME NOT NULL DEFAULT NOW(),
     heure_sortie TIME NULL,
     PRIMARY KEY (id_personnage, id_salle, heure_arrivee)
 );
@@ -190,23 +190,24 @@ $$ LANGUAGE plpgsql;
 --------------------------------------------------------------------------------------------------------
 
 -- Trigger pour gérer les déplacements des personnages
-CREATE OR REPLACE FUNCTION trigger_gestion_deplacement_personnage()
+CREATE OR REPLACE FUNCTION trigger_gestion_heure_sortie()
 RETURNS TRIGGER AS $$
 BEGIN
     -- Complète automatiquement l'heure de sortie de la salle précédente
     UPDATE visiter
-    SET heure_sortie = NEW.heure_arrivee
+    SET heure_sortie = NOW()
     WHERE id_personnage = NEW.id_personnage
       AND heure_sortie IS NULL;
 
+    -- Continue avec l'insertion de la nouvelle ligne
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_deplacement_personnage
+CREATE TRIGGER maj_heure_sortie_trigger
 BEFORE INSERT ON visiter
 FOR EACH ROW
-EXECUTE FUNCTION trigger_gestion_deplacement_personnage();
+EXECUTE FUNCTION trigger_gestion_heure_sortie();
 
 --------------------------------------------------------------------------------------------------------
 
@@ -218,5 +219,3 @@ EXECUTE FUNCTION trigger_gestion_deplacement_personnage();
     --> Remplace l’utilisation de SERIAL pour une meilleure conformité avec le standard SQL.
 --> FOREIGN KEY : assure que les valeurs d’une colonne existent dans une colonne de référence d’une autre table.
 --> REFERENCES : associe la clé étrangère à la clé primaire d’une autre table.
-
---------------------------------------------------------------------------------------------------------
