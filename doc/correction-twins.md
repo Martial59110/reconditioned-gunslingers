@@ -14,7 +14,7 @@ Les triggers fonctionnent.
 Le peuplement fonctionne.
 L'exactitude des données correspondent bien au jeu cluedo.
 Il n'y a pas d'erreur dans la création de la database de ses tables, users et leurs privilèges, procédures, triggers et le peuplement.
-Le README.md est bien présent cependant il manque un peu de contenu. Il aurait également été mieux de séparer les requêtes du README.md
+Le README.md est bien présent cependant il manque un peu de contenu.
 
 Les requêtes sont bien séparées et présentes dans le README.md mais certaines requêtes ne fonctionnent pas :
 La requête "Lister chaque joueur et son personnage associé" ne fonctionne pas car le "nom_role" dans le WHERE ne correspond pas (utilise "Enqueteur" au lieu de "ENQ").
